@@ -1,0 +1,51 @@
+﻿server:
+  port: 8081
+
+spring:
+  application:
+    name: life
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/life?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 16
+        max-idle: 8
+        min-idle: 2
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual      # 手动 ACK，失败重试防丢
+        prefetch: 50
+        retry:
+          enabled: true
+          max-attempts: 3
+    publisher-confirm-type: correlated
+    publisher-returns: true
+
+mybatis-plus:
+  type-aliases-package: com.life.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 业务参数
+life:
+  cache:
+    caffeine:
+      max-size: 100000
+      expire-seconds: 30           # Caffeine 短 TTL，作为 L1
+    redis:
+      ttl-minutes: 30              # Redis L2 TTL
+      null-ttl-seconds: 120        # 空值缓存 TTL（防穿透）
+  order:
+    unpaid-close-minutes: 15       # 未支付订单超时关单
